@@ -100,7 +100,7 @@ fn main() {
 
     let n : i32 = match args.get(1) {
         Some(x) => x.parse().unwrap(),
-        None => return ()
+        None => return
     };
 
     let eval : bool = match args.get(2) {
