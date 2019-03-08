@@ -1,4 +1,5 @@
 use std::fmt::{Display,Formatter,Result};
+use std::env;
 
 struct ExpNum {
     base : i32,
@@ -35,7 +36,7 @@ struct Factors {
 impl Factors {
     fn new(mut num : i32) -> Factors {
         let mut factors = Vec::new(); // Vector of the factors in num
-        for i in 2..(num as f64).sqrt() as i32 + 1 { // For every number between 2 and sqrt(num)
+        for i in 2..=(num as f64).sqrt() as i32 { // For every number between 2 and sqrt(num)
             let mut is = 0; // Number of that factor in num
             while num % i == 0 {
                 is += 1;
@@ -46,7 +47,7 @@ impl Factors {
             }
         }
 
-        if factors.len() == 0 { // if no factors, num is prime
+        if factors.is_empty() { // if no factors, num is prime
             factors.push(ExpNum::new(num,1));
         }
 
@@ -95,10 +96,25 @@ impl Display for Factors {
 }
 
 fn main() {
+    let args : Vec<_> = env::args().collect();
+
+    let n : i32 = match args.get(1) {
+        Some(x) => x.parse().unwrap(),
+        None => return ()
+    };
+
+    let eval : bool = match args.get(2) {
+        Some(x) => x == "eval",
+        None => false
+    };
+
     let mut result = Factors::new(12);
-    const N : i32 = 20;
-    for i in 2..N {
+    for i in 2..n {
         result.merge(Factors::new(i));
     }
-    println!("{} = {}", result, result.eval());
+    print!("{}", result);
+    if eval {
+        print!(" = {}", result.eval());
+    }
+    println!();
 }
