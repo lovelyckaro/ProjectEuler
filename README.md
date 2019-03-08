@@ -8,12 +8,13 @@ Smallest number divisible by all numbers from 1 to N
    Merging `2^2 * 3` and `2^3` would be `2^3 * 3`
 3. (Optional) Calculate product of all factors
 
-## Compilation:
+## Building:
+The entire program is written in Rust, [read more about Rust here](https://www.rust-lang.org/).<br>
 Compile using cargo, no external libraries are needed<br>
 ```
 `cargo build --release`
 ```
-## Usage:
+## Using:
 In CLI, run:<br>
 ```
 cargo run N
