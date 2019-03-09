@@ -79,8 +79,7 @@ impl Factors {
             let e = ExpNum::extract(&mut num, i);
             if e.is_some() {
                 factors.insert(e.unwrap());
-            }
-            
+            } 
         }
 
         if factors.is_empty() { // if no factors, num is prime
