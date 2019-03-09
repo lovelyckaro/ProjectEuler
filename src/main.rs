@@ -1,5 +1,7 @@
 use std::fmt::{Display,Formatter,Result};
+use std::collections::BTreeSet;
 use std::env;
+use std::cmp::Ordering;
 
 struct ExpNum {
     base : i32,
@@ -14,8 +16,45 @@ impl ExpNum {
         }
     }
 
+    fn extract(num : &mut i32, divisor : i32) -> Option<ExpNum> {
+        let mut ds = 0;
+        while *num % divisor == 0 {
+            ds += 1;
+            *num /= divisor;
+        }
+        if ds != 0 {
+            Some(ExpNum::new(divisor, ds))
+        }else {
+            None
+        }
+    }
+
     fn to_int(&self) -> i32 {
         self.base.pow(self.exponent as u32)
+    }
+
+    fn max_exponent(self, other : ExpNum) -> ExpNum {
+        if self.exponent > other.exponent {self} else {other}
+    }
+}
+
+impl PartialEq for ExpNum {
+    fn eq(&self, other : &ExpNum) -> bool {
+        self.base == other.base
+    }
+}
+
+impl Eq for ExpNum {}
+
+impl Ord for ExpNum {
+    fn cmp(&self, other : &ExpNum) -> Ordering {
+        self.base.cmp(&other.base)
+    }
+}
+
+impl PartialOrd for ExpNum {
+    fn partial_cmp(&self, other : &ExpNum) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -30,43 +69,39 @@ impl Display for ExpNum {
 }
 
 struct Factors {
-    factors : Vec<ExpNum>
+    factors : BTreeSet<ExpNum>
 }
 
 impl Factors {
     fn new(mut num : i32) -> Factors {
-        let mut factors = Vec::new(); // Vector of the factors in num
+        let mut factors = BTreeSet::new(); // Set of the factors in num
         for i in 2..=(num as f64).sqrt() as i32 { // For every number between 2 and sqrt(num)
-            let mut is = 0; // Number of that factor in num
-            while num % i == 0 {
-                is += 1;
-                num /= i;
+            let e = ExpNum::extract(&mut num, i);
+            if e.is_some() {
+                factors.insert(e.unwrap());
             }
-            if is != 0 {
-                factors.push(ExpNum::new(i, is));
-            }
+            
         }
 
         if factors.is_empty() { // if no factors, num is prime
-            factors.push(ExpNum::new(num,1));
+            factors.insert(ExpNum::new(num,1));
         }
 
         Factors {factors}
     }
 
+    fn insert_with(&mut self, e : ExpNum, f : impl Fn(ExpNum, ExpNum) -> ExpNum ) {
+        let fs = &mut self.factors;
+        if fs.contains(&e) {
+            let new = f (fs.take(&e).unwrap(), e);
+            fs.insert(new);
+        }else {
+            fs.insert(e);
+        }
+    }
+
     fn update_factor(&mut self, e : ExpNum) {
-        let mut contained = false;
-        for num in self.factors.iter_mut() {
-            if num.base == e.base {
-                contained = true;
-                if num.exponent < e.exponent {
-                    num.exponent = e.exponent;
-                }
-            }
-        }
-        if !contained {
-            self.factors.push(e);
-        }
+        self.insert_with(e, |x : ExpNum, o : ExpNum| x.max_exponent(o));
     }
 
     fn merge(&mut self, other : Factors) {
