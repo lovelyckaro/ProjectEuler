@@ -1,8 +1,13 @@
+extern crate num_bigint;
+extern crate num_traits;
+
 use std::fmt::{Display,Formatter,Result};
 use std::collections::BTreeSet;
 use std::env;
 use std::cmp::Ordering;
 use std::io::stdin;
+use num_bigint::BigInt;
+use num_traits::{pow, One};
 
 struct ExpNum {
     base : i32,
@@ -30,8 +35,10 @@ impl ExpNum {
         }
     }
 
-    fn eval(&self) -> i32 {
-        self.base.pow(self.exponent as u32)
+    fn eval(&self) -> BigInt {
+        let b = BigInt::from(self.base);
+        let e = self.exponent as usize;
+        pow(b,e)
     }
 
     fn max_exponent(self, other : ExpNum) -> ExpNum {
@@ -110,11 +117,8 @@ impl Factors {
         }
     }
 
-    fn eval(&self) -> i32 {
-        let mut result = 1;
-        for num in &self.factors {
-            result *= num.eval();
-        }
+    fn eval(self) -> BigInt {
+        let result : BigInt = self.factors.into_iter().map(|x : ExpNum| x.eval()).fold(One::one(), |acc : BigInt, e : BigInt| acc * e);
         result
     }
 }
