@@ -2,6 +2,7 @@ use std::fmt::{Display,Formatter,Result};
 use std::collections::BTreeSet;
 use std::env;
 use std::cmp::Ordering;
+use std::io::stdin;
 
 struct ExpNum {
     base : i32,
@@ -29,7 +30,7 @@ impl ExpNum {
         }
     }
 
-    fn to_int(&self) -> i32 {
+    fn eval(&self) -> i32 {
         self.base.pow(self.exponent as u32)
     }
 
@@ -75,7 +76,7 @@ struct Factors {
 impl Factors {
     fn new(mut num : i32) -> Factors {
         let mut factors = BTreeSet::new(); // Set of the factors in num
-        for i in 2..=(num as f64).sqrt() as i32 { // For every number between 2 and sqrt(num)
+        for i in 2..=(f64::from(num)).sqrt() as i32 { // For every number between 2 and sqrt(num)
             let e = ExpNum::extract(&mut num, i);
             if e.is_some() {
                 factors.insert(e.unwrap());
@@ -112,7 +113,7 @@ impl Factors {
     fn eval(&self) -> i32 {
         let mut result = 1;
         for num in &self.factors {
-            result *= num.to_int();
+            result *= num.eval();
         }
         result
     }
@@ -134,7 +135,7 @@ fn main() {
 
     let n : i32 = match args.get(1) {
         Some(x) => x.parse().unwrap(),
-        None => return
+        None => get_input()
     };
 
     let eval : bool = match args.get(2) {
@@ -142,7 +143,7 @@ fn main() {
         None => false
     };
 
-    let mut result = Factors::new(12);
+    let mut result = Factors::new(1);
     for i in 2..n {
         result.merge(Factors::new(i));
     }
@@ -151,4 +152,13 @@ fn main() {
         print!(" = {}", result.eval());
     }
     println!();
+}
+
+fn get_input() -> i32 {
+    println!("Please supply an upper bound : ");
+    let mut inp : String = String::from("");
+    stdin().read_line(&mut inp).expect("Couldn't read input");
+
+    let res : i32 = inp.trim().parse().expect("Couldn't parse integer");
+    res
 }
