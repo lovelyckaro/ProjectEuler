@@ -10,7 +10,7 @@ Smallest number divisible by all numbers from 1 to N
 
 ## Building:
 The entire program is written in Rust, [read more about Rust here](https://www.rust-lang.org/).<br>
-Compile using cargo, no external libraries are needed<br>
+Compile using cargo, num-bigint, and num-traits are dependencies<br>
 ```
 `cargo build --release`
 ```
