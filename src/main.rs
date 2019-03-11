@@ -118,7 +118,7 @@ impl Factors {
     }
 
     fn eval(self) -> BigInt {
-        let result : BigInt = self.factors.into_iter().map(|x : ExpNum| x.eval()).fold(One::one(), |acc : BigInt, e : BigInt| acc * e);
+        let result : BigInt = self.factors.into_iter().map(|x : ExpNum| x.eval()).fold(One::one(), |acc, e| acc * e);
         result
     }
 }

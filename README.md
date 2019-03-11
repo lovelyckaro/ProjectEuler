@@ -1,4 +1,4 @@
-# Project Euler
+# Project Euler Problem 5
 Smallest number divisible by all numbers from 1 to N
 
 ## Method:
